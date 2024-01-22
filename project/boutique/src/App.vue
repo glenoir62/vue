@@ -1,54 +1,62 @@
-<template>
-  <form>
-    <div>
-      <label>Activités</label>
-      <div>
-        <button @click="push({ name: '', good: false })" type="button">Ajouter une activité</button>
-      </div>
-    </div>
-    <div v-for="(field, i) in fields" :key="field.key">
-      <Field :name="`hobbies[${i}].name`" v-slot="{ field, errorMessage }">
-        <input v-bind="field" type="text" />
-        <p>{{ errorMessage }}</p>
-      </Field>
-      <Field :name="`hobbies[${i}].good`" v-slot="{ field }">
-        <div>
-          <input :id="`good[${i}]`" v-bind="field" type="radio" :value="true" />
-          <label :for="`good[${i}]`">Good</label>
-        </div>
-        <div>
-          <input :id="`bad[${i}]`" v-bind="field" type="radio" :value="false" />
-          <label :for="`bad[${i}]`">Bad</label>
-        </div>
-      </Field>
-      <button @click="remove(i)">Supprimer</button>
-      <br />
-      <br />
-    </div>
-    <pre>{{ values }}</pre>
-  </form>
-</template>
-
 <script setup lang="ts">
-import { useForm, useFieldArray, Field } from 'vee-validate'
-import { z } from 'zod'
-import { toFormValidator } from '@vee-validate/zod'
+import TheHeader from './components/Header.vue'
+import TheFooter from './components/Footer.vue'
+import Boutique from './features/boutique/Boutique.vue'
+import Admin from './features/admin/Admin.vue'
+import { reactive, type Component as C } from 'vue'
+import type { Page } from './interfaces'
+import { seed } from './data/seed'
 
-const validationSchema = toFormValidator(
-  z.object({
-    hobbies: z
-      .array(
-        z.object({
-          name: z.string({ required_error: 'obligatoire' }).min(5, { message: 'trop court !' }),
-          comment: z.string()
-        })
-      )
-      .optional()
-  })
-)
+const state = reactive<{
+  page: Page
+}>({
+  page: 'Boutique'
+})
 
-const { values } = useForm({ validationSchema })
-const { fields, push, remove } = useFieldArray('hobbies')
+const pages: { [s: string]: C } = {
+  Boutique,
+  Admin
+}
+
+function navigate(page: Page): void {
+  state.page = page
+}
+
+//seed('projetproducts')
 </script>
 
-<style scoped lang="scss"></style>
+<template>
+  <div class="app-container">
+    <TheHeader @navigate="navigate" :page="state.page" class="header" />
+    <div class="app-content">
+      <Suspense>
+        <Component :is="pages[state.page]" />
+      </Suspense>
+    </div>
+    <TheFooter class="footer" />
+  </div>
+</template>
+
+<style lang="scss">
+@use './assets/scss/base.scss' as *;
+@use './assets/scss/debug.scss' as *;
+
+.app-container {
+  height: 100vh;
+  display: grid;
+  grid-template-areas: 'header' 'app-content' 'footer';
+  grid-template-rows: 48px auto 48px;
+}
+
+.header {
+  grid-area: header;
+}
+
+.app-content {
+  grid-area: app-content;
+}
+
+.footer {
+  grid-area: footer;
+}
+</style>

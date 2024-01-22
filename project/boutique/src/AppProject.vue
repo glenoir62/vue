@@ -57,6 +57,8 @@ function removeProductFromCart(productId: number): void {
   }
 }
 const filteredProducts = computed(() => {
+  console.log(state.products.length)
+
   return state.products.filter((product) => {
     if (
       product.title.toLocaleLowerCase().startsWith(state.filters.search.toLocaleLowerCase()) &&
@@ -70,6 +72,7 @@ const filteredProducts = computed(() => {
     }
   })
 })
+
 const cartEmpty = computed(() => state.cart.length === 0)
 </script>
 
