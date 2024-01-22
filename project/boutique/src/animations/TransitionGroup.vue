@@ -1,7 +1,3 @@
-<!-- 
-  Vue offre la possibilité de réaliser des transitions sur des listes d'éléments,
-   par exemple des listes utilisant v-for.
--->
 <template>
   <div class="p-20">
     <div class="mb-20 d-flex w100 justify-content-center align-items-center">
