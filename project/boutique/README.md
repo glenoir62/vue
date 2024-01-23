@@ -45,6 +45,8 @@ npm run build
 npm run lint
 ```
 
+See https://restapi.fr/ for doc
+
 ```
 const vDirective = {
   // appelé avant que les attributs et les écouteurs

@@ -1,68 +1,63 @@
-<!-- 
-  Vue offre la possibilité de réaliser des transitions sur des listes d'éléments,
-   par exemple des listes utilisant v-for.
--->
+<script setup lang="ts">
+import TheHeader from './components/Header.vue'
+import TheFooter from './components/Footer.vue'
+import Boutique from './features/boutique/Boutique.vue'
+import Admin from './features/admin/Admin.vue'
+import { reactive, type Component as C } from 'vue'
+import type { Page } from './interfaces'
+import { seed40articles, seed } from './data/seed'
+
+const state = reactive<{
+  page: Page
+}>({
+  page: 'Boutique'
+})
+
+const pages: { [s: string]: C } = {
+  Boutique,
+  Admin
+}
+
+function navigate(page: Page): void {
+  state.page = page
+}
+
+// seed('vueprojectproducts')
+// seed40articles('vueprojectproducts');
+</script>
+
 <template>
-  <div class="p-20">
-    <div class="mb-20 d-flex w100 justify-content-center align-items-center">
-      <button class="btn btn-primary mr-20" @click="add">Ajouter</button>
-      <button class="btn btn-primary" @click="remove">Enlever</button>
+  <div class="app-container">
+    <TheHeader @navigate="navigate" :page="state.page" class="header" />
+    <div class="app-content">
+      <Suspense>
+        <Component :is="pages[state.page]" />
+      </Suspense>
     </div>
-    <div class="container">
-      <TransitionGroup name="list" tag="ul">
-        <li class="mb-10 card" v-for="item in items" :key="item">
-          {{ item }}
-        </li>
-      </TransitionGroup>
-    </div>
+    <TheFooter class="footer hide-xs" />
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-
-let nextNum = ref(10)
-const items = ref<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9])
-
-function randomIndex() {
-  return Math.floor(Math.random() * items.value.length)
-}
-
-function add() {
-  items.value.splice(randomIndex(), 0, nextNum.value++)
-}
-
-function remove() {
-  items.value.splice(randomIndex(), 1)
-}
-</script>
-
 <style lang="scss">
-@import './assets/scss/base.scss';
+@use './assets/scss/base.scss' as *;
+@use './assets/scss/debug.scss' as *;
 
-li {
-  cursor: pointer;
-  width: 100%;
+.app-container {
+  height: 100vh;
+  display: grid;
+  grid-template-areas: 'header' 'app-content' 'footer';
+  grid-template-rows: 48px auto 48px;
 }
 
-.container {
-  position: relative;
-  padding: 0;
+.header {
+  grid-area: header;
 }
 
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
+.app-content {
+  grid-area: app-content;
 }
 
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.list-leave-active {
-  position: absolute;
+.footer {
+  grid-area: footer;
 }
 </style>
